@@ -33,7 +33,8 @@ This project is a scalable backend API for managing payroll, attendance, overtim
 
 1. Clone this repo
 
-git clone https://github.com/yourname/payslip-system.git
+git clone https://github.com/dije07/Dealls-BE-Case-Study.git
+
 cd payslip-system
 
 2. Setup .env
