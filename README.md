@@ -33,41 +33,48 @@ This project is a scalable backend API for managing payroll, attendance, overtim
 
 1. Clone this repo
 
+<pre>
 git clone https://github.com/dije07/Dealls-BE-Case-Study.git
-
+</pre>
+<pre>
 cd payslip-system
+</pre>
 
 2. Setup `.env`
 
 <pre>
-  
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=yourpassword
 DB_NAME=postgres
-  
 </pre>
 
 3. Run PostgreSQL (e.g. via Docker)
 
+<pre>
 docker run --name payslip-postgres \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=yourpassword \
   -e POSTGRES_DB=payslip \
   -p 5432:5432 \
   -d postgres
+</pre>
 
 4. Run the app
 
+<pre>
 go run main.go
+</pre>
 
 ---
 
 🧪 Running Tests
 
+<pre>
 go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out
+</pre>
 
 ---
 
