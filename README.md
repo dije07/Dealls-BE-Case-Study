@@ -37,13 +37,17 @@ git clone https://github.com/dije07/Dealls-BE-Case-Study.git
 
 cd payslip-system
 
-2. Setup .env
+2. Setup `.env`
 
+<pre>
+  
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=yourpassword
 DB_NAME=postgres
+  
+</pre>
 
 3. Run PostgreSQL (e.g. via Docker)
 
@@ -88,6 +92,7 @@ go tool cover -html=coverage.out
 
 📂 Folder Structure
 
+<pre>
 .
 ├── handlers/            # HTTP endpoint logic
 ├── services/            # Business logic
@@ -97,3 +102,5 @@ go tool cover -html=coverage.out
 ├── routes/              # Route registration
 ├── seeder/              # Seed roles/users
 └── main.go              # App entry point
+</pre>
+
