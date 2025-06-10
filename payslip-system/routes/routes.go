@@ -44,7 +44,8 @@ func RegisterRoutes(e *echo.Echo) {
 		Service: overtimeService,
 	}
 	payrollHandler := &payrollHandlerPkg.PayrollHandler{
-		Service: payrollService,
+		Service:       payrollService,
+		GetPeriodByID: payrollRepositoryPkg.NewPayrollRepository().GetPeriodByID,
 	}
 	payslipHandler := &payslipHandlerPkg.PayslipHandler{
 		Service: payslipService,

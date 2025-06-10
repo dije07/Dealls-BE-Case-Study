@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -8,6 +10,7 @@ import (
 	"github.com/dije07/payslip-system/models"
 	"github.com/glebarez/sqlite" // ✅ pure Go SQLite driver
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -32,7 +35,13 @@ func TestOvertime_CreateAndExists(t *testing.T) {
 	userID := uuid.New()
 	today := time.Now().Truncate(24 * time.Hour)
 
-	err := repo.CreateOvertime(userID, 2, today)
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	err := repo.CreateOvertime(c, userID, 2, today)
 	assert.NoError(t, err)
 
 	exists := repo.OvertimeExists(userID, today)
@@ -44,8 +53,14 @@ func TestOvertime_GetOvertimeHistory(t *testing.T) {
 	userID := uuid.New()
 	today := time.Now().Truncate(24 * time.Hour)
 
-	_ = repo.CreateOvertime(userID, 2, today)
-	_ = repo.CreateOvertime(userID, 3, today.AddDate(0, 0, -1))
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	_ = repo.CreateOvertime(c, userID, 2, today)
+	_ = repo.CreateOvertime(c, userID, 3, today.AddDate(0, 0, -1))
 
 	history, err := repo.GetOvertimeHistory(userID)
 	assert.NoError(t, err)

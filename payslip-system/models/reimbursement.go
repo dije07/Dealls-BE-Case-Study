@@ -14,4 +14,7 @@ type Reimbursement struct {
 	Description string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	IPAddress   string
+	CreatedBy   uuid.UUID `gorm:"type:uuid"`
+	UpdatedBy   uuid.UUID `gorm:"type:uuid"`
 }

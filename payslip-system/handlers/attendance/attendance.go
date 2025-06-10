@@ -20,7 +20,7 @@ func (h *AttendanceHandler) SubmitAttendance(c echo.Context) error {
 	}
 	userID, _ := uuid.Parse(userIDStr)
 
-	if err := h.Service.SubmitAttendance(userID); err != nil {
+	if err := h.Service.SubmitAttendance(c, userID); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
 	}
 

@@ -24,7 +24,7 @@ func TestSubmitAttendance_Success(t *testing.T) {
 	c.Set("user_id", testUserID.String())
 
 	mockService := new(mocks.MockAttendanceService)
-	mockService.On("SubmitAttendance", testUserID).Return(nil)
+	mockService.On("SubmitAttendance", c, testUserID).Return(nil)
 
 	handler := &AttendanceHandler{Service: mockService}
 	err := handler.SubmitAttendance(c)
@@ -62,7 +62,7 @@ func TestSubmitAttendance_AlreadySubmitted(t *testing.T) {
 	c.Set("user_id", testUserID.String())
 
 	mockService := new(mocks.MockAttendanceService)
-	mockService.On("SubmitAttendance", testUserID).Return(errors.New("attendance already submitted for today"))
+	mockService.On("SubmitAttendance", c, testUserID).Return(errors.New("attendance already submitted for today"))
 
 	handler := &AttendanceHandler{Service: mockService}
 	err := handler.SubmitAttendance(c)

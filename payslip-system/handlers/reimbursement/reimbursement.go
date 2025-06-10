@@ -30,7 +30,7 @@ func (h *ReimbursementHandler) SubmitReimbursement(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid input"})
 	}
 
-	if err := h.Service.SubmitReimbursement(userID, req.Amount, req.Description); err != nil {
+	if err := h.Service.SubmitReimbursement(c, userID, req.Amount, req.Description); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
 	}
 

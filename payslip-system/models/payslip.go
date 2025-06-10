@@ -16,5 +16,8 @@ type Payslip struct {
 	OvertimePay    float64
 	Reimbursement  float64
 	TakeHomePay    float64
+	IPAddress      string
 	CreatedAt      time.Time
+	CreatedBy      uuid.UUID `gorm:"type:uuid"`
+	UpdatedBy      uuid.UUID `gorm:"type:uuid"`
 }

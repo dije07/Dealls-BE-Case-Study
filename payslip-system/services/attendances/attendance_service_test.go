@@ -1,6 +1,8 @@
 package services
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
@@ -8,6 +10,7 @@ import (
 	"github.com/dije07/payslip-system/models"
 	"github.com/dije07/payslip-system/repositories/mocks"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,11 +22,17 @@ func TestSubmitAttendance_Success(t *testing.T) {
 	userID := uuid.New()
 	today := time.Now().Truncate(24 * time.Hour)
 
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
 	mockRepo.On("AttendanceExists", userID, today).Return(false)
-	mockRepo.On("CreateAttendance", userID, today).Return(nil)
+	mockRepo.On("CreateAttendance", c, userID, today).Return(nil)
 
 	service := &AttendanceServiceImpl{Repo: mockRepo}
-	err := service.SubmitAttendance(userID)
+	err := service.SubmitAttendance(c, userID)
 
 	assert.NoError(t, err)
 	mockRepo.AssertExpectations(t)
@@ -39,8 +48,14 @@ func TestSubmitAttendance_Duplicate(t *testing.T) {
 
 	mockRepo.On("AttendanceExists", userID, today).Return(true)
 
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
 	service := &AttendanceServiceImpl{Repo: mockRepo}
-	err := service.SubmitAttendance(userID)
+	err := service.SubmitAttendance(c, userID)
 
 	assert.EqualError(t, err, "attendance already submitted for today")
 	mockRepo.AssertExpectations(t)
@@ -56,18 +71,28 @@ func TestNewAttendanceService_ReturnsImpl(t *testing.T) {
 }
 
 func TestSubmitAttendance_WeekendBlocked(t *testing.T) {
-	os.Unsetenv("TEST_MODE") // Disable test override
+	// ⏰ Force a Saturday
+	nowFunc = func() time.Time {
+		return time.Date(2025, 6, 7, 9, 0, 0, 0, time.UTC)
+	}
+	defer func() { nowFunc = time.Now }()
+
+	os.Unsetenv("TEST_MODE")
+	userID := uuid.New()
 
 	mockRepo := new(mocks.MockAttendanceRepo)
 	service := &AttendanceServiceImpl{Repo: mockRepo}
 
-	// Force time to Saturday by mocking now() logic (requires injection OR accept system state)
-	// For simplicity, just run the test on a weekend or let it pass for now
-	err := service.SubmitAttendance(uuid.New())
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
 
-	if time.Now().Weekday() == time.Saturday || time.Now().Weekday() == time.Sunday {
-		assert.EqualError(t, err, "cannot submit attendance on weekends")
-	}
+	err := service.SubmitAttendance(c, userID)
+
+	assert.EqualError(t, err, "cannot submit attendance on weekends")
+	mockRepo.AssertNotCalled(t, "AttendanceExists")
+	mockRepo.AssertNotCalled(t, "CreateAttendance")
 }
 
 func TestGetMyAttendance_Success(t *testing.T) {

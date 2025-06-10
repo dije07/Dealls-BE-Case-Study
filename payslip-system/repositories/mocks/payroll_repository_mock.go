@@ -5,6 +5,7 @@ import (
 
 	"github.com/dije07/payslip-system/models"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -17,8 +18,8 @@ func (m *MockPayrollRepo) PayrollPeriodExists(start, end time.Time) bool {
 	return args.Bool(0)
 }
 
-func (m *MockPayrollRepo) CreatePayrollPeriod(start, end time.Time) error {
-	args := m.Called(start, end)
+func (m *MockPayrollRepo) CreatePayrollPeriod(c echo.Context, userID uuid.UUID, start, end time.Time) error {
+	args := m.Called(c, userID, start, end)
 	return args.Error(0)
 }
 

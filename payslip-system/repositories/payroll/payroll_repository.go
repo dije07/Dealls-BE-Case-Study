@@ -6,6 +6,7 @@ import (
 	"github.com/dije07/payslip-system/database"
 	"github.com/dije07/payslip-system/models"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 )
 
 type PayrollRepoImpl struct{}
@@ -20,14 +21,18 @@ func (r *PayrollRepoImpl) PayrollPeriodExists(start, end time.Time) bool {
 	return err == nil
 }
 
-func (r *PayrollRepoImpl) CreatePayrollPeriod(start, end time.Time) error {
-	p := models.PayrollPeriod{
+func (r *PayrollRepoImpl) CreatePayrollPeriod(c echo.Context, userID uuid.UUID, start, end time.Time) error {
+	payroll := models.PayrollPeriod{
 		ID:        uuid.New(),
 		StartDate: start,
 		EndDate:   end,
 		IsClosed:  false,
+		CreatedBy: userID,
+		UpdatedBy: userID,
+		IPAddress: c.RealIP(),
 	}
-	return database.DB.Create(&p).Error
+	c.Set("entity_id", payroll.ID)
+	return database.DB.Create(&payroll).Error
 }
 
 func (r *PayrollRepoImpl) GetAllEmployees() ([]models.User, error) {
@@ -68,4 +73,10 @@ func (r *PayrollRepoImpl) ClosePayrollPeriod(periodID uuid.UUID) error {
 	return database.DB.Model(&models.PayrollPeriod{}).
 		Where("id = ?", periodID).
 		Update("is_closed", true).Error
+}
+
+func (r *PayrollRepoImpl) GetPeriodByID(id uuid.UUID) (models.PayrollPeriod, error) {
+	var period models.PayrollPeriod
+	err := database.DB.First(&period, "id = ?", id).Error
+	return period, err
 }

@@ -11,37 +11,50 @@ import (
 
 func AuditLogger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// Let the request proceed
+		// Ensure request ID exists
+		reqID := c.Request().Header.Get(echo.HeaderXRequestID)
+		if reqID == "" {
+			reqID = uuid.New().String()
+			c.Request().Header.Set(echo.HeaderXRequestID, reqID)
+		}
+		c.Response().Header().Set(echo.HeaderXRequestID, reqID)
+		c.Set("request_id", reqID)
+
+		// Call next
 		err := next(c)
 
-		// Only log POST, PUT, DELETE (not GETs)
-		if c.Request().Method != echo.POST && c.Request().Method != echo.PUT && c.Request().Method != echo.DELETE {
+		// Only log write actions
+		method := c.Request().Method
+		if method != echo.POST && method != echo.PUT && method != echo.DELETE {
 			return err
 		}
 
-		// Try to get user_id from context (set by JWT middleware)
-		userIDVal := c.Get("user_id")
+		// Extract user_id safely
 		var userID uuid.UUID
-		if userIDStr, ok := userIDVal.(string); ok {
-			parsed, err := uuid.Parse(userIDStr)
+		switch v := c.Get("user_id").(type) {
+		case string:
+			parsed, err := uuid.Parse(v)
 			if err == nil {
 				userID = parsed
 			}
+		case uuid.UUID:
+			userID = v
 		}
 
-		// Save audit log
+		entityID, _ := c.Get("entity_id").(uuid.UUID)
+
 		log := models.AuditLog{
-			Action:      c.Request().Method, // e.g., "POST"
-			Entity:      c.Path(),           // e.g., "/api/attendance"
-			EntityID:    uuid.Nil,           // optional: can be updated later if needed
+			ID:          uuid.New(),
+			Action:      method,
+			Entity:      c.Path(),
+			EntityID:    entityID,
 			PerformedBy: userID,
 			IP:          c.RealIP(),
-			RequestID:   c.Response().Header().Get(echo.HeaderXRequestID),
+			RequestID:   reqID,
 			CreatedAt:   time.Now(),
 		}
 
 		_ = database.DB.Create(&log)
-
 		return err
 	}
 }

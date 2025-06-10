@@ -6,6 +6,7 @@ import (
 	"github.com/dije07/payslip-system/database"
 	"github.com/dije07/payslip-system/models"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 )
 
 type AttendanceRepoImpl struct{}
@@ -20,13 +21,17 @@ func (r *AttendanceRepoImpl) AttendanceExists(userID uuid.UUID, date time.Time) 
 	return err == nil
 }
 
-func (r *AttendanceRepoImpl) CreateAttendance(userID uuid.UUID, date time.Time) error {
-	a := models.Attendance{
-		ID:     uuid.New(), // ✅ ensure unique ID
-		UserID: userID,
-		Date:   date,
+func (r *AttendanceRepoImpl) CreateAttendance(c echo.Context, userID uuid.UUID, date time.Time) error {
+	attendance := models.Attendance{
+		ID:        uuid.New(), // ✅ ensure unique ID
+		UserID:    userID,
+		Date:      date,
+		CreatedBy: userID,
+		UpdatedBy: userID,
+		IPAddress: c.RealIP(),
 	}
-	return database.DB.Create(&a).Error
+	c.Set("entity_id", attendance.ID)
+	return database.DB.Create(&attendance).Error
 }
 
 func (r *AttendanceRepoImpl) GetAttendanceHistory(userID uuid.UUID) ([]models.Attendance, error) {

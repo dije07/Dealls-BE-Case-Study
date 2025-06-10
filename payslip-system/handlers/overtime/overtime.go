@@ -29,7 +29,7 @@ func (h *OvertimeHandler) SubmitOvertime(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid input"})
 	}
 
-	if err := h.Service.SubmitOvertime(userID, req.Hours); err != nil {
+	if err := h.Service.SubmitOvertime(c, userID, req.Hours); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
 	}
 

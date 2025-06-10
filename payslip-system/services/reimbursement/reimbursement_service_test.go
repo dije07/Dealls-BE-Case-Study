@@ -1,22 +1,31 @@
 package services
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/dije07/payslip-system/models"
 	"github.com/dije07/payslip-system/repositories/mocks"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSubmitReimbursement_Success(t *testing.T) {
 	userID := uuid.New()
 
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
 	mockRepo := new(mocks.MockReimbursementRepo)
-	mockRepo.On("CreateReimbursement", userID, 100000.0, "Lunch").Return(nil)
+	mockRepo.On("CreateReimbursement", c, userID, 100000.0, "Lunch").Return(nil)
 
 	service := NewReimbursementService(mockRepo)
-	err := service.SubmitReimbursement(userID, 100000, "Lunch")
+	err := service.SubmitReimbursement(c, userID, 100000, "Lunch")
 
 	assert.NoError(t, err)
 	mockRepo.AssertExpectations(t)
@@ -25,8 +34,14 @@ func TestSubmitReimbursement_Success(t *testing.T) {
 func TestSubmitReimbursement_ZeroAmount(t *testing.T) {
 	userID := uuid.New()
 
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
 	service := NewReimbursementService(new(mocks.MockReimbursementRepo))
-	err := service.SubmitReimbursement(userID, 0, "Food")
+	err := service.SubmitReimbursement(c, userID, 0, "Food")
 
 	assert.EqualError(t, err, "amount must be greater than zero")
 }
@@ -34,8 +49,14 @@ func TestSubmitReimbursement_ZeroAmount(t *testing.T) {
 func TestSubmitReimbursement_EmptyDescription(t *testing.T) {
 	userID := uuid.New()
 
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
 	service := NewReimbursementService(new(mocks.MockReimbursementRepo))
-	err := service.SubmitReimbursement(userID, 150000, "")
+	err := service.SubmitReimbursement(c, userID, 150000, "")
 
 	assert.EqualError(t, err, "description is required")
 }

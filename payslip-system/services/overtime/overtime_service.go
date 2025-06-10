@@ -8,6 +8,7 @@ import (
 	repositoryInterfaces "github.com/dije07/payslip-system/repositories/interfaces"
 	"github.com/dije07/payslip-system/services/interfaces"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 )
 
 type OvertimeServiceImpl struct {
@@ -18,7 +19,7 @@ func NewOvertimeService(repo repositoryInterfaces.OvertimeRepository) interfaces
 	return &OvertimeServiceImpl{Repo: repo}
 }
 
-func (s *OvertimeServiceImpl) SubmitOvertime(userID uuid.UUID, hours int) error {
+func (s *OvertimeServiceImpl) SubmitOvertime(c echo.Context, userID uuid.UUID, hours int) error {
 	if hours < 1 || hours > 3 {
 		return errors.New("overtime must be between 1–3 hours")
 	}
@@ -28,7 +29,7 @@ func (s *OvertimeServiceImpl) SubmitOvertime(userID uuid.UUID, hours int) error 
 		return errors.New("overtime already submitted for today")
 	}
 
-	return s.Repo.CreateOvertime(userID, hours, today)
+	return s.Repo.CreateOvertime(c, userID, hours, today)
 }
 
 func (s *OvertimeServiceImpl) GetMyOvertime(userID uuid.UUID) ([]models.Overtime, error) {

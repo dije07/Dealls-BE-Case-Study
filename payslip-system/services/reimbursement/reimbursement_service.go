@@ -7,6 +7,7 @@ import (
 	repositoryInterfaces "github.com/dije07/payslip-system/repositories/interfaces"
 	"github.com/dije07/payslip-system/services/interfaces"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 )
 
 type ReimbursementServiceImpl struct {
@@ -17,14 +18,14 @@ func NewReimbursementService(repo repositoryInterfaces.ReimbursementRepository) 
 	return &ReimbursementServiceImpl{Repo: repo}
 }
 
-func (s *ReimbursementServiceImpl) SubmitReimbursement(userID uuid.UUID, amount float64, description string) error {
+func (s *ReimbursementServiceImpl) SubmitReimbursement(c echo.Context, userID uuid.UUID, amount float64, description string) error {
 	if amount <= 0 {
 		return errors.New("amount must be greater than zero")
 	}
 	if len(description) == 0 {
 		return errors.New("description is required")
 	}
-	return s.Repo.CreateReimbursement(userID, amount, description)
+	return s.Repo.CreateReimbursement(c, userID, amount, description)
 }
 
 func (s *ReimbursementServiceImpl) GetMyReimbursements(userID uuid.UUID) ([]models.Reimbursement, error) {

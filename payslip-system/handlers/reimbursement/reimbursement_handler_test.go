@@ -34,7 +34,7 @@ func TestSubmitReimbursement_Success(t *testing.T) {
 	c.Set("user_id", userID.String())
 
 	mockService := new(mocks.MockReimbursementService)
-	mockService.On("SubmitReimbursement", userID, 150000.0, "Transport reimbursement").Return(nil)
+	mockService.On("SubmitReimbursement", c, userID, 150000.0, "Transport reimbursement").Return(nil)
 
 	handler := &ReimbursementHandler{Service: mockService}
 	err := handler.SubmitReimbursement(c)
@@ -136,8 +136,7 @@ func TestSubmitReimbursement_ServiceError(t *testing.T) {
 	c.Set("user_id", testUserID.String())
 
 	mockService := new(mocks.MockReimbursementService)
-	mockService.On("SubmitReimbursement", testUserID, 0.0, "testing").
-		Return(errors.New("amount must be greater than zero"))
+	mockService.On("SubmitReimbursement", c, testUserID, 0.0, "testing").Return(errors.New("amount must be greater than zero"))
 
 	handler := &ReimbursementHandler{Service: mockService}
 	err := handler.SubmitReimbursement(c)

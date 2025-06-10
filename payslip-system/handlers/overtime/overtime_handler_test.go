@@ -32,7 +32,7 @@ func TestSubmitOvertime_Success(t *testing.T) {
 	c.Set("role", "employee")
 
 	mockService := new(mocks.MockOvertimeService)
-	mockService.On("SubmitOvertime", testUserID, 2).Return(nil)
+	mockService.On("SubmitOvertime", c, testUserID, 2).Return(nil)
 
 	handler := &OvertimeHandler{Service: mockService}
 	err := handler.SubmitOvertime(c)
@@ -96,7 +96,7 @@ func TestSubmitOvertime_AlreadySubmitted(t *testing.T) {
 	c.Set("user_id", testUserID.String())
 
 	mockService := new(mocks.MockOvertimeService)
-	mockService.On("SubmitOvertime", testUserID, 3).Return(errors.New("overtime already submitted"))
+	mockService.On("SubmitOvertime", c, testUserID, 3).Return(errors.New("overtime already submitted"))
 
 	handler := &OvertimeHandler{Service: mockService}
 	err := handler.SubmitOvertime(c)

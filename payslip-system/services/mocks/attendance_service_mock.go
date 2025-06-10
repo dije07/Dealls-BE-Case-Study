@@ -3,6 +3,7 @@ package mocks
 import (
 	"github.com/dije07/payslip-system/models"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -10,8 +11,8 @@ type MockAttendanceService struct {
 	mock.Mock
 }
 
-func (m *MockAttendanceService) SubmitAttendance(userID uuid.UUID) error {
-	args := m.Called(userID)
+func (m *MockAttendanceService) SubmitAttendance(c echo.Context, userID uuid.UUID) error {
+	args := m.Called(c, userID)
 	return args.Error(0)
 }
 

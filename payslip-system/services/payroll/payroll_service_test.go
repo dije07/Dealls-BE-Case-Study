@@ -2,12 +2,15 @@ package services
 
 import (
 	"errors"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
 	"github.com/dije07/payslip-system/models"
 	"github.com/dije07/payslip-system/repositories/mocks"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -15,13 +18,20 @@ import (
 func TestCreatePayrollPeriod_Success(t *testing.T) {
 	start := time.Now()
 	end := start.AddDate(0, 0, 5)
+	id := uuid.New()
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
 
 	mockRepo := new(mocks.MockPayrollRepo)
 	mockRepo.On("PayrollPeriodExists", start, end).Return(false)
-	mockRepo.On("CreatePayrollPeriod", start, end).Return(nil)
+	mockRepo.On("CreatePayrollPeriod", c, id, start, end).Return(nil)
 
 	service := NewPayrollService(mockRepo)
-	err := service.CreatePayrollPeriod(start, end)
+	err := service.CreatePayrollPeriod(c, id, start, end)
 
 	assert.NoError(t, err)
 	mockRepo.AssertExpectations(t)
@@ -30,9 +40,16 @@ func TestCreatePayrollPeriod_Success(t *testing.T) {
 func TestCreatePayrollPeriod_EndBeforeStart(t *testing.T) {
 	start := time.Now()
 	end := start.AddDate(0, 0, -1)
+	id := uuid.New()
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
 
 	service := NewPayrollService(new(mocks.MockPayrollRepo))
-	err := service.CreatePayrollPeriod(start, end)
+	err := service.CreatePayrollPeriod(c, id, start, end)
 
 	assert.EqualError(t, err, "end date cannot be before start date")
 }
@@ -40,12 +57,19 @@ func TestCreatePayrollPeriod_EndBeforeStart(t *testing.T) {
 func TestCreatePayrollPeriod_Duplicate(t *testing.T) {
 	start := time.Now()
 	end := start.AddDate(0, 0, 7)
+	id := uuid.New()
 
 	mockRepo := new(mocks.MockPayrollRepo)
 	mockRepo.On("PayrollPeriodExists", start, end).Return(true)
 
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
 	service := NewPayrollService(mockRepo)
-	err := service.CreatePayrollPeriod(start, end)
+	err := service.CreatePayrollPeriod(c, id, start, end)
 
 	assert.EqualError(t, err, "payroll period already exists")
 	mockRepo.AssertExpectations(t)

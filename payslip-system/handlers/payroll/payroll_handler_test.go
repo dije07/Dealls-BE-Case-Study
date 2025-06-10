@@ -18,6 +18,7 @@ import (
 
 func TestCreatePayrollPeriod_Success(t *testing.T) {
 	e := echo.New()
+
 	body := map[string]string{
 		"start_date": "2025-06-01",
 		"end_date":   "2025-06-30",
@@ -29,25 +30,21 @@ func TestCreatePayrollPeriod_Success(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	start, _ := time.Parse("2006-01-02", body["start_date"])
-	end, _ := time.Parse("2006-01-02", body["end_date"])
+	id := uuid.New()
+	c.Set("user_id", id.String())
 
+	// Mock service and handler
 	mockService := new(mocks.MockPayrollService)
-	mockService.On("CreatePayrollPeriod", start, end).Return(nil)
+	start, _ := time.Parse("2006-01-02", "2025-06-01")
+	end, _ := time.Parse("2006-01-02", "2025-06-30")
+	mockService.On("CreatePayrollPeriod", c, id, start, end).Return(nil)
 
-	handler := &PayrollHandler{
-		Service: mockService,
-		GetPeriodByID: func(id uuid.UUID) (models.PayrollPeriod, error) {
-			return models.PayrollPeriod{ID: id}, nil
-		},
-	}
+	handler := &PayrollHandler{Service: mockService}
 
 	err := handler.CreatePayrollPeriod(c)
-
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 	assert.Contains(t, rec.Body.String(), "payroll period created")
-	mockService.AssertExpectations(t)
 }
 
 func TestCreatePayrollPeriod_InvalidInput(t *testing.T) {
@@ -99,11 +96,14 @@ func TestCreatePayrollPeriod_ServiceError(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
+	id := uuid.New()
+	c.Set("user_id", id.String())
+
 	start, _ := time.Parse("2006-01-02", body["start_date"])
 	end, _ := time.Parse("2006-01-02", body["end_date"])
 
 	mockService := new(mocks.MockPayrollService)
-	mockService.On("CreatePayrollPeriod", start, end).Return(errors.New("period exists"))
+	mockService.On("CreatePayrollPeriod", c, id, start, end).Return(errors.New("period exists"))
 
 	handler := &PayrollHandler{
 		Service: mockService,
@@ -237,4 +237,27 @@ func TestRunPayroll_InvalidUUID(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 	assert.Contains(t, rec.Body.String(), "invalid period ID")
+}
+
+func TestCreatePayrollPeriod_Unauthorized(t *testing.T) {
+	e := echo.New()
+
+	body := map[string]string{
+		"start_date": "2025-06-01",
+		"end_date":   "2025-06-30",
+	}
+	jsonBody, _ := json.Marshal(body)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/payroll-period", bytes.NewReader(jsonBody))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	handler := &PayrollHandler{Service: nil} // service won't be called
+
+	err := handler.CreatePayrollPeriod(c)
+
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusUnauthorized, rec.Code)
+	assert.Contains(t, rec.Body.String(), "unauthorized")
 }

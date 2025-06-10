@@ -1,13 +1,17 @@
 package services
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
 	"github.com/dije07/payslip-system/models"
 	"github.com/dije07/payslip-system/repositories/mocks"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestSubmitOvertime_Success(t *testing.T) {
@@ -16,10 +20,16 @@ func TestSubmitOvertime_Success(t *testing.T) {
 
 	mockRepo := new(mocks.MockOvertimeRepo)
 	mockRepo.On("OvertimeExists", userID, today).Return(false)
-	mockRepo.On("CreateOvertime", userID, 2, today).Return(nil)
+	mockRepo.On("CreateOvertime", mock.AnythingOfType("*echo.context"), userID, 2, mock.AnythingOfType("time.Time")).Return(nil)
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
 
 	service := &OvertimeServiceImpl{Repo: mockRepo}
-	err := service.SubmitOvertime(userID, 2)
+	err := service.SubmitOvertime(c, userID, 2)
 
 	assert.NoError(t, err)
 	mockRepo.AssertExpectations(t)
@@ -29,7 +39,13 @@ func TestSubmitOvertime_TooManyHours(t *testing.T) {
 	userID := uuid.New()
 	service := &OvertimeServiceImpl{}
 
-	err := service.SubmitOvertime(userID, 5) // > 3 hours
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	err := service.SubmitOvertime(c, userID, 5) // > 3 hours
 	assert.EqualError(t, err, "overtime must be between 1–3 hours")
 }
 
@@ -40,8 +56,14 @@ func TestSubmitOvertime_AlreadySubmitted(t *testing.T) {
 	mockRepo := new(mocks.MockOvertimeRepo)
 	mockRepo.On("OvertimeExists", userID, today).Return(true)
 
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
 	service := &OvertimeServiceImpl{Repo: mockRepo}
-	err := service.SubmitOvertime(userID, 2)
+	err := service.SubmitOvertime(c, userID, 2)
 
 	assert.EqualError(t, err, "overtime already submitted for today")
 	mockRepo.AssertExpectations(t)

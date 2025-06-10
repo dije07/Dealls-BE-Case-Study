@@ -6,6 +6,7 @@ import (
 	"github.com/dije07/payslip-system/database"
 	"github.com/dije07/payslip-system/models"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 )
 
 type OvertimeRepoImpl struct{}
@@ -20,13 +21,17 @@ func (r *OvertimeRepoImpl) OvertimeExists(userID uuid.UUID, date time.Time) bool
 	return err == nil
 }
 
-func (r *OvertimeRepoImpl) CreateOvertime(userID uuid.UUID, hours int, date time.Time) error {
+func (r *OvertimeRepoImpl) CreateOvertime(c echo.Context, userID uuid.UUID, hours int, date time.Time) error {
 	overtime := models.Overtime{
-		ID:     uuid.New(),
-		UserID: userID,
-		Hours:  hours,
-		Date:   date,
+		ID:        uuid.New(),
+		UserID:    userID,
+		Hours:     hours,
+		Date:      date,
+		CreatedBy: userID,
+		UpdatedBy: userID,
+		IPAddress: c.RealIP(),
 	}
+	c.Set("entity_id", overtime.ID)
 	return database.DB.Create(&overtime).Error
 }
 

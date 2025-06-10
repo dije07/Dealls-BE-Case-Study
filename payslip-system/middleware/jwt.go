@@ -31,8 +31,15 @@ func JWTAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		claims := token.Claims.(jwt.MapClaims)
-		c.Set("user_id", claims["user_id"])
-		c.Set("role", claims["role"])
+
+		userID, ok := claims["user_id"].(string)
+		if !ok {
+			return c.JSON(http.StatusUnauthorized, echo.Map{"error": "Invalid token claims"})
+		}
+		c.Set("user_id", userID)
+
+		role, _ := claims["role"].(string)
+		c.Set("role", role)
 
 		return next(c)
 	}

@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -8,6 +10,7 @@ import (
 	"github.com/dije07/payslip-system/models"
 	"github.com/glebarez/sqlite"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -42,7 +45,15 @@ func TestPayrollPeriod_CreateAndExists(t *testing.T) {
 	exists := repo.PayrollPeriodExists(start, end)
 	assert.False(t, exists)
 
-	err := repo.CreatePayrollPeriod(start, end)
+	id := uuid.New()
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	err := repo.CreatePayrollPeriod(c, id, start, end)
 	assert.NoError(t, err)
 
 	exists = repo.PayrollPeriodExists(start, end)

@@ -5,6 +5,7 @@ import (
 
 	"github.com/dije07/payslip-system/models"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -17,8 +18,8 @@ func (m *MockAttendanceRepo) AttendanceExists(userID uuid.UUID, date time.Time) 
 	return args.Bool(0)
 }
 
-func (m *MockAttendanceRepo) CreateAttendance(userID uuid.UUID, date time.Time) error {
-	args := m.Called(userID, date)
+func (m *MockAttendanceRepo) CreateAttendance(c echo.Context, userID uuid.UUID, date time.Time) error {
+	args := m.Called(c, userID, date)
 	return args.Error(0)
 }
 

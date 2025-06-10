@@ -1,12 +1,15 @@
 package repositories
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/dije07/payslip-system/database"
 	"github.com/dije07/payslip-system/models"
 	"github.com/glebarez/sqlite"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -30,7 +33,13 @@ func TestCreateReimbursement(t *testing.T) {
 	repo := setupTestReimbursementRepo(t)
 	userID := uuid.New()
 
-	err := repo.CreateReimbursement(userID, 200000, "Transport")
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	err := repo.CreateReimbursement(c, userID, 200000, "Transport")
 	assert.NoError(t, err)
 
 	var result models.Reimbursement
@@ -44,8 +53,14 @@ func TestGetReimbursementsByUser(t *testing.T) {
 	repo := setupTestReimbursementRepo(t)
 	userID := uuid.New()
 
-	repo.CreateReimbursement(userID, 100000, "Meals")
-	repo.CreateReimbursement(userID, 50000, "Taxi")
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	repo.CreateReimbursement(c, userID, 100000, "Meals")
+	repo.CreateReimbursement(c, userID, 50000, "Taxi")
 
 	list, err := repo.GetReimbursementsByUser(userID)
 	assert.NoError(t, err)

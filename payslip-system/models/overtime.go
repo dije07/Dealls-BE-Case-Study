@@ -12,6 +12,9 @@ type Overtime struct {
 	User      User      `gorm:"foreignKey:UserID"`
 	Date      time.Time `gorm:"index"` // Used for unique per-day constraint
 	Hours     int
+	IPAddress string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	CreatedBy uuid.UUID `gorm:"type:uuid"`
+	UpdatedBy uuid.UUID `gorm:"type:uuid"`
 }

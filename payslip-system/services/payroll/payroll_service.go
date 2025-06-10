@@ -9,6 +9,7 @@ import (
 	repositoryInterfaces "github.com/dije07/payslip-system/repositories/interfaces"
 	"github.com/dije07/payslip-system/services/interfaces"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 )
 
 type PayrollServiceImpl struct {
@@ -19,14 +20,14 @@ func NewPayrollService(repo repositoryInterfaces.PayrollRepository) interfaces.P
 	return &PayrollServiceImpl{Repo: repo}
 }
 
-func (s *PayrollServiceImpl) CreatePayrollPeriod(start, end time.Time) error {
+func (s *PayrollServiceImpl) CreatePayrollPeriod(c echo.Context, userID uuid.UUID, start, end time.Time) error {
 	if end.Before(start) {
 		return errors.New("end date cannot be before start date")
 	}
 	if s.Repo.PayrollPeriodExists(start, end) {
 		return errors.New("payroll period already exists")
 	}
-	return s.Repo.CreatePayrollPeriod(start, end)
+	return s.Repo.CreatePayrollPeriod(c, userID, start, end)
 }
 
 func (s *PayrollServiceImpl) RunPayroll(period models.PayrollPeriod) error {

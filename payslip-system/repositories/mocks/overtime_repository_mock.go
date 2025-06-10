@@ -5,6 +5,7 @@ import (
 
 	"github.com/dije07/payslip-system/models"
 	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -17,8 +18,8 @@ func (m *MockOvertimeRepo) OvertimeExists(userID uuid.UUID, date time.Time) bool
 	return args.Bool(0)
 }
 
-func (m *MockOvertimeRepo) CreateOvertime(userID uuid.UUID, hours int, date time.Time) error {
-	args := m.Called(userID, hours, date)
+func (m *MockOvertimeRepo) CreateOvertime(c echo.Context, userID uuid.UUID, hours int, date time.Time) error {
+	args := m.Called(c, userID, hours, date)
 	return args.Error(0)
 }
 

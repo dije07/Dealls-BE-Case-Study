@@ -35,7 +35,12 @@ func (h *PayrollHandler) CreatePayrollPeriod(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid date format (use YYYY-MM-DD)"})
 	}
 
-	if err := h.Service.CreatePayrollPeriod(start, end); err != nil {
+	userIDStr, ok := c.Get("user_id").(string)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, echo.Map{"error": "unauthorized"})
+	}
+	userID := uuid.MustParse(userIDStr)
+	if err := h.Service.CreatePayrollPeriod(c, userID, start, end); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
 	}
 
