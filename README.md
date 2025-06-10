@@ -1,12 +1,9 @@
 # 🧾 Payslip Management System (Go + Echo + PostgreSQL)
-# 🧾 Payslip Management System (Go + Echo + PostgreSQL)
 
-This project is a scalable backend API for managing payroll, attendance, overtime, and reimbursements — built with **Go**, **Echo**, and **PostgreSQL**. Designed for seamless integration with HR or admin dashboards.
 This project is a scalable backend API for managing payroll, attendance, overtime, and reimbursements — built with **Go**, **Echo**, and **PostgreSQL**. Designed for seamless integration with HR or admin dashboards.
 
 ---
 
-## 📦 Features
 ## 📦 Features
 
 - 🔐 JWT-based authentication (admin & employee roles)
@@ -25,7 +22,6 @@ This project is a scalable backend API for managing payroll, attendance, overtim
 ---
 
 ## 🛠️ Tech Stack
-## 🛠️ Tech Stack
 
 | Component        | Tech                         |
 |------------------|------------------------------|
@@ -41,23 +37,17 @@ This project is a scalable backend API for managing payroll, attendance, overtim
 ---
 
 ## 🚀 Getting Started
-## 🚀 Getting Started
 
-### 1. Clone this repo
 ### 1. Clone this repo
 
 <pre>
 git clone https://github.com/dije07/Dealls-BE-Case-Study.git
-<pre>
 git clone https://github.com/dije07/Dealls-BE-Case-Study.git
 cd payslip-system
 </pre>
-</pre>
 
 ### 2. Setup `.env`
-### 2. Setup `.env`
 
-<pre>
 <pre>
 DB_HOST=localhost
 DB_PORT=5432
@@ -65,12 +55,9 @@ DB_USER=postgres
 DB_PASSWORD=yourpassword
 DB_NAME=postgres
 </pre>
-</pre>
 
 ### 3. Run PostgreSQL (example via Docker)
-### 3. Run PostgreSQL (example via Docker)
 
-<pre>
 <pre>
 docker run --name payslip-postgres \
   -e POSTGRES_USER=postgres \
@@ -79,23 +66,17 @@ docker run --name payslip-postgres \
   -p 5432:5432 \
   -d postgres
 </pre>
-</pre>
 
 ### 4. Run the app
-### 4. Run the app
 
-<pre>
 <pre>
 go run main.go
-</pre>
 </pre>
 
 ---
 
 ## 🧪 Running Tests
-## 🧪 Running Tests
 
-<pre>
 <pre>
 go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out
@@ -107,20 +88,12 @@ Includes:
 - ✅ Unit tests for handlers, services, repositories
 - ✅ Integration tests for all endpoints
 go test ./tests/integration/...
-</pre>
-
-Includes:
-
-- ✅ Unit tests for handlers, services, repositories
-- ✅ Integration tests for all endpoints
 
 ---
 
 ## 📬 API Endpoints (Summary)
-## 📬 API Endpoints (Summary)
 
 | Method | Endpoint                   | Role     | Description                 |
-|--------|----------------------------|----------|-----------------------------|
 |--------|----------------------------|----------|-----------------------------|
 | POST   | `/login`                   | All      | Login and get JWT           |
 | GET    | `/me`                      | All      | Get current user profile    |
@@ -141,9 +114,7 @@ Includes:
 ---
 
 ## 📂 Folder Structure
-## 📂 Folder Structure
 
-<pre>
 <pre>
 .
 ├── handlers/            # HTTP endpoint logic
