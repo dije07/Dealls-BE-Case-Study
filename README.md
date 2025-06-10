@@ -150,5 +150,3 @@ go test ./tests/integration/...
 You can test the API using the provided Postman collection:
 
 📁 **File:** `payslip_system.postman_collection.json`  
-🔗 Or use the online collection:
-[Open in Postman](https://api.postman.com/collections/11930344-397e3b12-b7ed-42a9-b0a3-b67d828673d4?access_key=PMAT-01JXBYRZ6R02HQ69G8BGA8YDBE)
