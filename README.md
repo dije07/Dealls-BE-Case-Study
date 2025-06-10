@@ -1,9 +1,12 @@
 # 🧾 Payslip Management System (Go + Echo + PostgreSQL)
+# 🧾 Payslip Management System (Go + Echo + PostgreSQL)
 
+This project is a scalable backend API for managing payroll, attendance, overtime, and reimbursements — built with **Go**, **Echo**, and **PostgreSQL**. Designed for seamless integration with HR or admin dashboards.
 This project is a scalable backend API for managing payroll, attendance, overtime, and reimbursements — built with **Go**, **Echo**, and **PostgreSQL**. Designed for seamless integration with HR or admin dashboards.
 
 ---
 
+## 📦 Features
 ## 📦 Features
 
 - 🔐 JWT-based authentication (admin & employee roles)
@@ -15,9 +18,13 @@ This project is a scalable backend API for managing payroll, attendance, overtim
 - 🧪 100% unit test coverage (handlers, services, repositories)
 - 🧾 Audit logging for all critical actions
 - 🌐 IP address & request ID tracking for traceability
+- 🧪 100% unit test coverage (handlers, services, repositories)
+- 🧾 Audit logging for all critical actions
+- 🌐 IP address & request ID tracking for traceability
 
 ---
 
+## 🛠️ Tech Stack
 ## 🛠️ Tech Stack
 
 | Component        | Tech                         |
@@ -28,20 +35,29 @@ This project is a scalable backend API for managing payroll, attendance, overtim
 | ORM              | GORM                         |
 | Auth             | JWT Middleware               |
 | Testing          | Testify + Echo Integration   |
+| Auth             | JWT Middleware               |
+| Testing          | Testify + Echo Integration   |
 
 ---
 
 ## 🚀 Getting Started
+## 🚀 Getting Started
 
+### 1. Clone this repo
 ### 1. Clone this repo
 
 <pre>
 git clone https://github.com/dije07/Dealls-BE-Case-Study.git
+<pre>
+git clone https://github.com/dije07/Dealls-BE-Case-Study.git
 cd payslip-system
+</pre>
 </pre>
 
 ### 2. Setup `.env`
+### 2. Setup `.env`
 
+<pre>
 <pre>
 DB_HOST=localhost
 DB_PORT=5432
@@ -49,9 +65,12 @@ DB_USER=postgres
 DB_PASSWORD=yourpassword
 DB_NAME=postgres
 </pre>
+</pre>
 
 ### 3. Run PostgreSQL (example via Docker)
+### 3. Run PostgreSQL (example via Docker)
 
+<pre>
 <pre>
 docker run --name payslip-postgres \
   -e POSTGRES_USER=postgres \
@@ -60,20 +79,33 @@ docker run --name payslip-postgres \
   -p 5432:5432 \
   -d postgres
 </pre>
+</pre>
 
+### 4. Run the app
 ### 4. Run the app
 
 <pre>
+<pre>
 go run main.go
+</pre>
 </pre>
 
 ---
 
 ## 🧪 Running Tests
+## 🧪 Running Tests
 
+<pre>
 <pre>
 go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out
+go test ./tests/integration/...
+</pre>
+
+Includes:
+
+- ✅ Unit tests for handlers, services, repositories
+- ✅ Integration tests for all endpoints
 go test ./tests/integration/...
 </pre>
 
@@ -85,10 +117,13 @@ Includes:
 ---
 
 ## 📬 API Endpoints (Summary)
+## 📬 API Endpoints (Summary)
 
 | Method | Endpoint                   | Role     | Description                 |
 |--------|----------------------------|----------|-----------------------------|
+|--------|----------------------------|----------|-----------------------------|
 | POST   | `/login`                   | All      | Login and get JWT           |
+| GET    | `/me`                      | All      | Get current user profile    |
 | GET    | `/me`                      | All      | Get current user profile    |
 | POST   | `/api/attendance`          | Employee | Submit attendance           |
 | GET    | `/api/attendance`          | Employee | View attendance history     |
@@ -97,20 +132,26 @@ Includes:
 | POST   | `/api/reimbursement`       | Employee | Submit reimbursement        |
 | GET    | `/api/reimbursement`       | Employee | View reimbursement history  |
 | GET    | `/api/payslip/:id`         | Employee | View payslip                |
+| GET    | `/api/payslip/:id`         | Employee | View payslip                |
 | POST   | `/api/payroll-period`      | Admin    | Create payroll period       |
+| POST   | `/api/run-payroll`         | Admin    | Run payroll                 |
 | POST   | `/api/run-payroll`         | Admin    | Run payroll                 |
 | GET    | `/api/payslip-summary/:id` | Admin    | View summary of payslips    |
 
 ---
 
 ## 📂 Folder Structure
+## 📂 Folder Structure
 
+<pre>
 <pre>
 .
 ├── handlers/            # HTTP endpoint logic
 ├── services/            # Business logic
 ├── repositories/        # DB queries with interface abstraction
+├── repositories/        # DB queries with interface abstraction
 ├── models/              # GORM models
+├── middleware/          # JWT, audit log, request ID
 ├── middleware/          # JWT, audit log, request ID
 ├── routes/              # Route registration
 ├── seeder/              # Seed roles/users
